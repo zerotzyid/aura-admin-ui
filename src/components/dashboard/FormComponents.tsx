@@ -30,26 +30,31 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
 );
 FormInput.displayName = "FormInput";
 
+// IMPROVED COMPONENT — Added success/hint to Textarea
 /* ===== Textarea ===== */
 interface FormTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   error?: string;
+  success?: string;
+  hint?: string;
 }
 
 export const FormTextarea = React.forwardRef<HTMLTextAreaElement, FormTextareaProps>(
-  ({ label, error, className, ...props }, ref) => (
+  ({ label, error, success, hint, className, ...props }, ref) => (
     <div className="space-y-1.5">
       {label && <label className="text-sm font-medium text-foreground">{label}</label>}
       <textarea
         ref={ref}
         className={cn(
           "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:outline-none focus:ring-2 min-h-[100px] resize-y",
-          error ? "border-destructive focus:ring-destructive/30" : "border-input focus:ring-ring/30",
+          error ? "border-destructive focus:ring-destructive/30" : success ? "border-success focus:ring-success/30" : "border-input focus:ring-ring/30",
           className
         )}
         {...props}
       />
       {error && <p className="text-xs text-destructive">{error}</p>}
+      {success && <p className="text-xs text-success">{success}</p>}
+      {hint && !error && !success && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   )
 );
