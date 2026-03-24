@@ -179,5 +179,5 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onCh
         {description && <p className="text-xs text-muted-foreground">{description}</p>}
       </div>
     )}
-  </label>
+  </div>
 );
