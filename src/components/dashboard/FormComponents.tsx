@@ -157,7 +157,7 @@ interface ToggleSwitchProps {
 }
 
 export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onChange, description }) => (
-  <label className="flex items-start gap-3 cursor-pointer">
+  <div className="flex items-start gap-3 cursor-pointer" onClick={() => onChange?.(!checked)}>
     <button
       type="button"
       role="switch"
