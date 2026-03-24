@@ -30,54 +30,69 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
 );
 FormInput.displayName = "FormInput";
 
+// IMPROVED COMPONENT — Added success/hint to Textarea
 /* ===== Textarea ===== */
 interface FormTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   error?: string;
+  success?: string;
+  hint?: string;
 }
 
 export const FormTextarea = React.forwardRef<HTMLTextAreaElement, FormTextareaProps>(
-  ({ label, error, className, ...props }, ref) => (
+  ({ label, error, success, hint, className, ...props }, ref) => (
     <div className="space-y-1.5">
       {label && <label className="text-sm font-medium text-foreground">{label}</label>}
       <textarea
         ref={ref}
         className={cn(
           "w-full rounded-xl border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:outline-none focus:ring-2 min-h-[100px] resize-y",
-          error ? "border-destructive focus:ring-destructive/30" : "border-input focus:ring-ring/30",
+          error ? "border-destructive focus:ring-destructive/30" : success ? "border-success focus:ring-success/30" : "border-input focus:ring-ring/30",
           className
         )}
         {...props}
       />
       {error && <p className="text-xs text-destructive">{error}</p>}
+      {success && <p className="text-xs text-success">{success}</p>}
+      {hint && !error && !success && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   )
 );
 FormTextarea.displayName = "FormTextarea";
 
+// IMPROVED COMPONENT — Added success/hint to Select, added chevron icon
 /* ===== Select ===== */
 interface FormSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
+  success?: string;
+  hint?: string;
   options: { label: string; value: string }[];
 }
 
 export const FormSelect = React.forwardRef<HTMLSelectElement, FormSelectProps>(
-  ({ label, error, options, className, ...props }, ref) => (
+  ({ label, error, success, hint, options, className, ...props }, ref) => (
     <div className="space-y-1.5">
       {label && <label className="text-sm font-medium text-foreground">{label}</label>}
-      <select
-        ref={ref}
-        className={cn(
-          "h-10 w-full rounded-xl border bg-background px-4 text-sm text-foreground transition-all duration-200 focus:outline-none focus:ring-2 appearance-none",
-          error ? "border-destructive focus:ring-destructive/30" : "border-input focus:ring-ring/30",
-          className
-        )}
-        {...props}
-      >
-        {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </select>
+      <div className="relative">
+        <select
+          ref={ref}
+          className={cn(
+            "h-10 w-full rounded-xl border bg-background px-4 pr-10 text-sm text-foreground transition-all duration-200 focus:outline-none focus:ring-2 appearance-none cursor-pointer",
+            error ? "border-destructive focus:ring-destructive/30" : success ? "border-success focus:ring-success/30" : "border-input focus:ring-ring/30",
+            className
+          )}
+          {...props}
+        >
+          {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+        <svg className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
       {error && <p className="text-xs text-destructive">{error}</p>}
+      {success && <p className="text-xs text-success">{success}</p>}
+      {hint && !error && !success && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   )
 );
@@ -142,7 +157,7 @@ interface ToggleSwitchProps {
 }
 
 export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onChange, description }) => (
-  <label className="flex items-start gap-3 cursor-pointer">
+  <div className="flex items-start gap-3 cursor-pointer" onClick={() => onChange?.(!checked)}>
     <button
       type="button"
       role="switch"
@@ -164,5 +179,5 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ label, checked, onCh
         {description && <p className="text-xs text-muted-foreground">{description}</p>}
       </div>
     )}
-  </label>
+  </div>
 );

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Search, Inbox } from "lucide-react";
+import { Skeleton } from "@/components/dashboard/UIComponents";
 
 interface Column<T> {
   key: string;
@@ -17,10 +18,12 @@ interface DataTableProps<T> {
   searchPlaceholder?: string;
   emptyMessage?: string;
   actions?: React.ReactNode;
+  loading?: boolean;
 }
 
+// IMPROVED COMPONENT — Added loading skeleton state
 export function DataTable<T extends Record<string, any>>({
-  columns, data, pageSize = 10, searchable = true, searchPlaceholder = "Search...", emptyMessage = "No data found", actions
+  columns, data, pageSize = 10, searchable = true, searchPlaceholder = "Search...", emptyMessage = "No data found", actions, loading = false
 }: DataTableProps<T>) {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<string | null>(null);
@@ -73,10 +76,10 @@ export function DataTable<T extends Record<string, any>>({
               {columns.map(col => (
                 <th
                   key={col.key}
-                  onClick={() => col.sortable && handleSort(col.key)}
+                  onClick={() => col.sortable && !loading && handleSort(col.key)}
                   className={cn(
                     "px-6 py-3 text-left font-semibold text-muted-foreground",
-                    col.sortable && "cursor-pointer select-none hover:text-foreground transition-colors"
+                    col.sortable && !loading && "cursor-pointer select-none hover:text-foreground transition-colors"
                   )}
                 >
                   <span className="inline-flex items-center gap-1">
@@ -90,7 +93,18 @@ export function DataTable<T extends Record<string, any>>({
             </tr>
           </thead>
           <tbody>
-            {paged.length === 0 ? (
+            {loading ? (
+              // Loading skeleton rows
+              Array.from({ length: 5 }).map((_, rowIdx) => (
+                <tr key={`skeleton-${rowIdx}`} className="border-b border-border last:border-0">
+                  {columns.map(col => (
+                    <td key={col.key} className="px-6 py-4">
+                      <Skeleton className={cn("h-4", col.key === "name" ? "w-32" : col.key === "actions" ? "w-8" : "w-20")} />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : paged.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className="px-6 py-16 text-center">
                   <Inbox className="mx-auto h-10 w-10 text-muted-foreground/40" />
@@ -112,7 +126,7 @@ export function DataTable<T extends Record<string, any>>({
         </table>
       </div>
 
-      {totalPages > 1 && (
+      {!loading && totalPages > 1 && (
         <div className="flex items-center justify-between border-t border-border px-6 py-3">
           <p className="text-sm text-muted-foreground">
             Showing {page * pageSize + 1}–{Math.min((page + 1) * pageSize, sorted.length)} of {sorted.length}
